@@ -1,0 +1,35 @@
+
+.btn-login {
+    font-family: 'Judson';
+    font-style: normal;
+    font-weight: 700;
+    width: 115px;
+    height: 35px;
+    border: 1px solid #B1DDB8;
+    background: #FFFFFF;
+    border-radius: 54px;
+    color: #B1DDB8;
+}
+
+    .btn-login:hover {
+        background: #B1DDB8;
+        border-radius: 54px;
+        color: #ffffff;
+    }
+
+.btn-signup {
+    font-family: 'Judson';
+    font-style: normal;
+    font-weight: 700;
+    width: 115px;
+    height: 35px;
+    background: #B1DDB8;
+    border-radius: 54px;
+    color: #ffffff;
+}
+
+    .btn-signup:hover {
+        border: 1px solid #B1DDB8;
+        background: #FFFFFF;
+        color: #B1DDB8;
+    }
