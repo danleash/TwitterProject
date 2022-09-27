@@ -1,7 +1,4 @@
-﻿using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using TwitterProject.Shared.Models;
+﻿
 
 namespace TwitterProject.Client.Services
 {
@@ -12,11 +9,11 @@ namespace TwitterProject.Client.Services
         /// THIS ENTIRE ENDPOINT IS DEPRACATED THANKS TWITTER
         /// </summary>
         //*******************************************************//
-        private readonly HttpClient _httpClient;
+
+
+        /*private readonly HttpClient _httpClient;
         private readonly ILogger<TwitterLanguageService> _logger;
-        private readonly string ApiKey = "rkKuYxg50VKZp9BAOshvYEhNw";
-        private readonly string Secret = "Oi4Q26oFfFdsxCip3kT52qFTynTI9Vqv2QJzBMqbJLGc42gICk";
-        private readonly string BearerToken = "AAAAAAAAAAAAAAAAAAAAABiChQEAAAAASLJSK6KV04RZqnLMMy%2BCZHRifhk%3D7RKfe3kTnxkBXmW7HsMZH7VnAikIZy9QfIpotobEyiyliVIrAV";
+        
         public TwitterLanguageService(IHttpClientFactory clientFactory, ILoggerFactory loggerFactory)
         {
             _httpClient = clientFactory.CreateClient("LanguageRequestClient");
@@ -55,6 +52,6 @@ namespace TwitterProject.Client.Services
                 _logger.LogError(ex, "Error occurred while retrieving language codes from Twitter Api");
                 return null;
             }
-        }
+        }*/
     }
 }
