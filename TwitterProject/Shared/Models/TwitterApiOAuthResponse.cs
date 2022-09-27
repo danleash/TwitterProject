@@ -10,4 +10,11 @@ namespace TwitterProject.Shared.Models
         [JsonPropertyName("access_token")]
         public string AccessToken { get; set; }
     }
+    public class TwitterApiLanguageResponse
+    {
+        [JsonPropertyName("code")]
+        public string Code { get; set; }
+        [JsonPropertyName("name")]
+        public string Language { get; set; }
+    }
 }

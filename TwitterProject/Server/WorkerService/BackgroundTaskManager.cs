@@ -13,15 +13,12 @@ namespace TwitterProject.Server.WorkerService
         private readonly IHubContext<SignalRStreamService> _signalRService;
         private Stream TwitterStreamResult { get; set; }
         private readonly TweetStorageService _tweetStorageService;
-
-        //Horrible practice, we would use secrets or an Azure Key Vault in production - for this we're hard coding the values. 
-        private readonly string ApiKey = "rkKuYxg50VKZp9BAOshvYEhNw";
-        private readonly string Secret = "Oi4Q26oFfFdsxCip3kT52qFTynTI9Vqv2QJzBMqbJLGc42gICk";
-        private readonly string BearerToken = "AAAAAAAAAAAAAAAAAAAAABiChQEAAAAASLJSK6KV04RZqnLMMy%2BCZHRifhk%3D7RKfe3kTnxkBXmW7HsMZH7VnAikIZy9QfIpotobEyiyliVIrAV";
+        private readonly IConfigurationSection _twitterApiConfigs;
         
-        public BackgroundTaskManager(IHttpClientFactory httpClientFactory, ILoggerFactory loggerFactory, TweetStorageService tweetStorage, IHubContext<SignalRStreamService> signalRStreamService)
+        public BackgroundTaskManager(IHttpClientFactory httpClientFactory, ILoggerFactory loggerFactory, TweetStorageService tweetStorage, IHubContext<SignalRStreamService> signalRStreamService, IConfiguration configuration)
         {
             _httpClient = httpClientFactory.CreateClient("TwitterApiHttpClient");
+            _twitterApiConfigs = configuration.GetSection("TwitterSettings");
             _logger = loggerFactory.CreateLogger<BackgroundTaskManager>();
             _tweetStorageService = tweetStorage;
             _signalRService = signalRStreamService;
@@ -31,7 +28,7 @@ namespace TwitterProject.Server.WorkerService
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{ApiKey}:{Secret}")));
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{_twitterApiConfigs.GetValue<string>("ApiKey")}:{_twitterApiConfigs.GetValue<string>("Secret")}")));
                 var formContent = new FormUrlEncodedContent(new[]
                     {
                     new KeyValuePair<string, string>("grant_type", "client_credentials")
@@ -42,7 +39,7 @@ namespace TwitterProject.Server.WorkerService
                 var tokenResponse = JsonSerializer.Deserialize<TwitterApiOAuthResponse>(await result.Content.ReadAsStringAsync());
                 if (tokenResponse == null)
                 {
-                    throw new Exception($"Failed to retrieve access token with credentials key: {ApiKey} secret: {Secret}");
+                    throw new Exception($"Access token response was null. Failed to retrieve access token with api credentials.");
                 }
 
                 //Set the bearer token with the access token
@@ -79,14 +76,11 @@ namespace TwitterProject.Server.WorkerService
 
                     //Deserialize 
                     var streamLineData = JsonSerializer.Deserialize<TwitterStreamResponse>(input);
-                    var formattedTweet = new TweetModel
-                    {
-                        Id = streamLineData.Data.Id,
-                        Text = streamLineData.Data.Text,
-                        Language = streamLineData.Data.LanguageCode,
-                        TweetHeader = $"Tweet-{streamLineData.Data.Id}",
-                        Entities = streamLineData.Data.Entities
-                    };
+                    if (streamLineData.Data == null) continue;
+
+                    //Convert to tweet model
+                    var formattedTweet = _tweetStorageService.BuildTweet(streamLineData);
+
                     //Check to see if a language filter exists, if it does we will only stream for the language requested. 
                     if(formattedTweet.Language == _tweetStorageService.LanguageFilter || string.IsNullOrWhiteSpace(_tweetStorageService.LanguageFilter))
                     {
@@ -97,9 +91,11 @@ namespace TwitterProject.Server.WorkerService
                         var metricModel = _tweetStorageService.ReturnLiveMetrics();
 
                         //Send tweets to the client
+                        _logger.LogDebug($"Sending tweet {formattedTweet.Id}.");
                         await _signalRService.Clients.All.SendAsync("Tweets", formattedTweet);
 
                         //Send the metrics to the client
+                        _logger.LogDebug($"Sending metrics.");
                         await _signalRService.Clients.All.SendAsync("Metrics", metricModel);
                     }
                 }

@@ -1,0 +1,30 @@
+﻿@typeparam TItem
+<tr class="@TableRowClasses @(RowClick != null ? "action" : "")" @onclick="@(_ => RowClick?.Invoke(Item))">
+    @RowTemplate(Item)
+</tr>
+@if (RowExpandable != null)
+{
+    @RowExpandable(Item)
+}
+@code {
+    [Parameter]
+    public string TableRowClasses { get; set; }
+    [Parameter]
+    public RenderFragment<TItem> RowExpandable { get; set; }
+    [Parameter]
+    public Action<TItem> RowClick { get; set; }
+    [Parameter]
+    public TItem Item { get; set; }
+    [Parameter]
+    public RenderFragment<TItem> RowTemplate { get; set; }
+
+    private int HashCode { get; set; } = 0;
+
+    protected override bool ShouldRender()
+    {
+        //var oldHash = HashCode;
+        //HashCode = Item.GetHashCode() + RowTemplate.GetHashCode() + TableRowClasses.GetHashCode() + (RowExpandable?.GetHashCode() ?? 0) + (RowClick?.GetHashCode() ?? 0);
+        //return oldHash != HashCode;
+        return true;
+    }
+}

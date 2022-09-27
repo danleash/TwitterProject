@@ -1,0 +1,94 @@
+﻿@using System.Timers
+@using System.Text.Json
+@using Microsoft.Extensions.Logging
+@using TwitterProject.Client.Services
+@typeparam TItem
+@inject ILogger<Table<TItem>> _logger
+@*@inject ModalService _modalService*@
+
+<div class="table-responsive @TableWrapperClasses" tabindex="0">
+    <table id="@TableId" class="table mb-1 @TableClasses">
+        <thead>
+            <tr class="@TableHeaderRowClasses">
+                        @HeaderTemplate
+            </tr>
+        </thead>
+        <tbody class="@TableBodyClasses table-height @(Items.Count > 4 ? "d-block": "")">
+            @if (Items.Any())
+            {
+                    <Virtualize Items="Items" OverscanCount="8" Context="item" TItem="TItem">
+                        <ItemContent>
+                            <TableRow Item="item" RowClick="RowClick" TableRowClasses="@TableRowClasses" RowTemplate="RowTemplate" RowExpandable="RowExpandable" />
+                        </ItemContent>
+                        <Placeholder>
+                            <div class="col-4 mx-auto align-self-center text-center">
+                                <img src="/images/chart-icon.svg" class="chart-icon-loader" alt="Loading chart data" />
+                            </div>
+                        </Placeholder>
+                    </Virtualize>
+               
+            }
+            else
+            {
+                @Placeholder
+            }
+        </tbody>
+        
+    </table>
+</div>
+@if (Items.Any())
+{
+    <caption class="small text-center d-block my-2">
+        <span>Showing @Items.Count results</span>
+    </caption>
+}
+
+@code
+{
+    [Parameter]
+    public string TableId { get; set; }
+
+    [Parameter]
+    public string TableClasses { get; set; }
+
+    [Parameter]
+    public string TableWrapperClasses { get; set; } = string.Empty;
+
+    [Parameter]
+    public string TableBodyClasses { get; set; } = string.Empty;
+
+    [Parameter]
+    public string TableRowClasses { get; set; } = string.Empty;
+
+    [Parameter]
+    public string TableHeaderRowClasses { get; set; } = string.Empty;
+    [Parameter]
+    public bool EnableTableControls { get; set; } = true;
+
+    [Parameter]
+    public RenderFragment HeaderTemplate { get; set; }
+    [Parameter]
+    public RenderFragment HeaderExpandable { get; set; }
+
+    [Parameter]
+    public Action<TItem> RowClick { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem> RowTemplate { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem> RowExpandable { get; set; }
+
+    [Parameter]
+    public RenderFragment Placeholder { get; set; }
+
+    [Parameter]
+    public RenderFragment FooterTemplate { get; set; }
+
+    [Parameter]
+    public ICollection<TItem> Items { get; set; }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+}

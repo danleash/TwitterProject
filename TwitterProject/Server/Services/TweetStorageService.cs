@@ -8,7 +8,16 @@ namespace TwitterProject.Server.Services
         public int CurrentTweetCount { get; set; } = 0;
         public Dictionary<string, int> HashTagsPairs { get; set; } = new();
         public string? LanguageFilter { get; set; }
+        private readonly ILogger _logger;
+        public TweetStorageService()
+        {
 
+        }
+        public TweetStorageService(ILoggerFactory logger)
+        {
+            _logger = logger.CreateLogger<TweetStorageService>();
+        }
+        
         /// <summary>
         /// Takes in a formatted tweet from the twitter api stream and increments the total count. 
         /// </summary>
@@ -17,6 +26,7 @@ namespace TwitterProject.Server.Services
         {
             //Increment tweet count
             CurrentTweetCount++;
+            _logger.LogInformation($"Tweet count incremented. Current tweet count is {CurrentTweetCount}");
             BuildHashTagList(model);
         }
         /// <summary>
@@ -34,9 +44,15 @@ namespace TwitterProject.Server.Services
                     //Iterate through each hashtag and increment count if exists or add if not existing.
                     foreach (var tag in hashtags)
                     {
-                        if (HashTagsPairs != null && !HashTagsPairs.TryAdd(tag.Tag, 1))
+                        if (HashTagsPairs != null)
                         {
-                            HashTagsPairs[tag.Tag]++;
+                            //check if tag already added
+                            if (HashTagsPairs.ContainsKey(tag.Tag))
+                                HashTagsPairs[tag.Tag]++;
+                            else
+                            {
+                                HashTagsPairs.TryAdd(tag.Tag, 1);
+                            }
                         }
                     }
                 }
@@ -48,13 +64,32 @@ namespace TwitterProject.Server.Services
         /// <returns>TweetMetricStreamModel</returns>
         public TweetMetricStreamModel ReturnLiveMetrics()
         {
-            if (HashTagsPairs.Count < 10) return null;
-            //Order to grab the most used hashtags
-            var topTenHashTags = HashTagsPairs.OrderByDescending(x => x.Value).Take(10);
+            IEnumerable<KeyValuePair<string, int>> topTenHashTags;
+            //While there are less than 10 tweets (common) don't limit the amount streamed to only take 10.
+            if (HashTagsPairs.Count < 10)
+            {
+                topTenHashTags = HashTagsPairs.OrderByDescending(x => x.Value);
+            }
+            else
+            {
+                //Order to grab the most used hashtags and take top ten
+                topTenHashTags = HashTagsPairs.OrderByDescending(x => x.Value).Take(10);
+            }
             return new TweetMetricStreamModel
             {
                 TweetCount = CurrentTweetCount,
                 HashTagPairs = topTenHashTags
+            };
+        }
+        public virtual TweetModel BuildTweet(TwitterStreamResponse streamResponse)
+        {
+            return new TweetModel
+            {
+                Id = streamResponse.Data.Id,
+                Text = streamResponse.Data.Text,
+                Language = streamResponse.Data.LanguageCode,
+                TweetHeader = $"Tweet-{streamResponse.Data.Id}",
+                Entities = streamResponse.Data.Entities
             };
         }
     }

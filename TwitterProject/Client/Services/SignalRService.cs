@@ -9,15 +9,17 @@ namespace TwitterProject.Client.Services
         private HubConnection? _hubConnection;
         private readonly NavigationManager _navigationManager;
         private readonly ILoggerProvider _loggerProvider;
+        private readonly ILogger<SignalRService> _logger;
 
         //Event for when we receive metrics
         public event Action<TweetMetricStreamModel>? TweetMetricReceived;
         //Event for when we receive a tweet
         public event Action<TweetModel>? TweetReceived;
-        public SignalRService(NavigationManager navigationManager, ILoggerProvider loggerProvider)
+        public SignalRService(NavigationManager navigationManager, ILoggerProvider loggerProvider, ILoggerFactory loggerFactory)
         {
             _navigationManager = navigationManager;
             _loggerProvider = loggerProvider;
+            _logger = loggerFactory.CreateLogger<SignalRService>();
             _hubConnection = new HubConnectionBuilder()
             .WithUrl(_navigationManager.ToAbsoluteUri("/tweetStream"))
              .AddJsonProtocol(options =>
@@ -34,10 +36,12 @@ namespace TwitterProject.Client.Services
 
             _hubConnection.On<TweetMetricStreamModel>("Metrics", (streamModel) =>
             {
+                _logger.LogInformation("Metrics received.");
                 TweetMetricReceived?.Invoke(streamModel);
             });
             _hubConnection.On<TweetModel>("Tweets", (tweet) =>
             {
+                _logger.LogInformation("Tweet received.");
                 TweetReceived?.Invoke(tweet);
             });
 
@@ -46,9 +50,12 @@ namespace TwitterProject.Client.Services
         public async void StartSignalRStream()
         {
             if(_hubConnection != null) await _hubConnection.StartAsync();
+            if(IsConnected) _logger.LogInformation("Signal R Hub connected.");
+
         }
         public async void SetLanguageFilter(string languageCode)
         {
+            _logger.LogInformation($"Setting language filter to {languageCode}.");
             await _hubConnection.InvokeAsync("SetLanguage", languageCode);
         }
         //Set the state of the hubConnection

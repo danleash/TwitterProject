@@ -1,0 +1,15 @@
+﻿    <th scope="col" class="@Classes @(string.IsNullOrWhiteSpace(DisplayText) ? "ellipses": string.Empty)">@((MarkupString)DisplayText)</th>
+
+@code
+{
+    
+
+    [Parameter]
+    public string DisplayText { get; set; }
+
+    [Parameter]
+    public string Classes { get; set; }
+
+    [Parameter]
+    public RenderFragment HeaderContent { get; set; }
+}

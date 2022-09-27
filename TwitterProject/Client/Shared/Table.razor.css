@@ -1,0 +1,326 @@
+﻿/********** Table Scrollbar **********/
+.table-height {
+    max-height: calc(70vh - 2.5rem);
+    overflow-y: auto;
+}
+
+/* size */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 2.5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px #d2d4d6;
+    border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #808080;
+    border-radius: 10px;
+}
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #808080;
+    }
+/*Data definitions*/
+body[data-dark='true'] #table-actions-menu {
+    border: 2px solid azure;
+}
+
+#data-definitions {
+    border: 2px solid #ced4da;
+}
+/******** Table Actions **********/
+::deep #inline-search-box {
+    border-top-left-radius: .5rem;
+    border-bottom-left-radius: .5rem;
+    border-right: 0;
+}
+
+    ::deep #inline-search-box.advanced-search {
+        border-bottom-left-radius: 0;
+    }
+
+::deep #inline-search {
+    border-radius: 0;
+    border-color: #ced4da;
+    border-left: 0;
+    padding: 0 1rem;
+    background-color: #ffffff;
+}
+
+::deep #inline-search-box:focus ~ #inline-search {
+    border-color: #4E9F9E;
+}
+
+::deep #search:hover .search-icon {
+    filter: invert(54%) sepia(38%) saturate(474%) hue-rotate(130deg) brightness(97%) contrast(89%);
+}
+
+::deep .search-icon {
+    vertical-align: middle;
+}
+
+::deep #table-controls .input-group {
+    justify-content: flex-end;
+}
+
+::deep #table-actions-menu {
+    border: 2px solid #ced4da;
+}
+
+body[data-dark='true'] #table-controls ::deep #table-actions-menu {
+    border: 2px solid azure;
+}
+
+
+
+
+
+
+::deep ul.dropdown-menu {
+    padding: 0;
+    transform: none !important;
+    top: unset !important;
+    left: unset !important;
+}
+
+    ::deep ul.dropdown-menu li.active {
+        background-color: #384F80;
+        background-color: rgba(56, 79, 128, .2);
+        color: #384f80;
+        cursor: pointer;
+    }
+
+        ::deep ul.dropdown-menu li.active a {
+            color: #384f80;
+        }
+
+    ::deep ul.dropdown-menu li:hover, ul.dropdown-menu li:focus {
+        background-color: #9d9d9d;
+        background-color: rgba(157, 157, 157, 0.3);
+        color: #4A494A;
+        cursor: pointer;
+    }
+
+    ::deep ul.dropdown-menu li a:hover {
+        text-decoration: none;
+        color: #4A494A;
+    }
+
+@media screen and (max-width: 600px) {
+    ::deep #table-search-box {
+        max-width: unset;
+        border-right: 0;
+    }
+}
+
+/*********** Table Ellipses ***************/
+::deep .ellipses {
+    width: 25%;
+    text-align: center;
+}
+
+    ::deep .ellipses .dropdown {
+        position: static;
+    }
+
+::deep .menu-btn {
+    padding: 8px 15.5px;
+    color: #4A494A;
+}
+
+    ::deep .menu-btn:hover, ::deep .menu-btn:focus, ::deep .menu-btn:active, ::deep .show.menu-btn {
+        background-color: #9d9d9d;
+        background-color: rgba(157, 157, 157, 0.3);
+        border-radius: 50%;
+        outline: none;
+        color: #4A494A;
+    }
+
+::deep .ellipses .dropdown-menu .dropdown-item:hover {
+    background-color: #9d9d9d;
+    background-color: rgba(157, 157, 157, 0.3);
+    color: #4A494A;
+}
+
+
+::deep .menu-btn + div.dropdown-menu > .dropdown-item {
+    padding: 0.375rem 1.875rem;
+}
+
+/*********** Table Styles ***************/
+table {
+    font-size: 14px;
+    white-space: nowrap;
+    border-spacing: 0;
+    border-collapse: separate;
+}
+
+    table thead {
+        color: #ffffff;
+    }
+
+body[data-dark='true'] .table {
+    color: #d1d1d1;
+}
+
+::deep .vertical-divider {
+    width: 3%;
+}
+
+::deep .table td, ::deep .table th {
+    border-top: 0;
+}
+
+::deep table thead th {
+    background-color: #1DA1F2;
+    border-top: 0;
+    border-bottom: 2px solid #ced4da;
+}
+
+    ::deep table thead th:first-child {
+        border-left: 0;
+        border-top-left-radius: .5rem;
+    }
+
+    ::deep table thead th:last-child {
+        border-right: 0;
+        border-top-right-radius: .5rem;
+    }
+
+::deep table thead td {
+    border-bottom: 2px solid #ced4da;
+    padding-top: .75rem;
+}
+
+    ::deep table thead td:first-child {
+        border-left: 2px solid #ced4da;
+    }
+
+    ::deep table thead td:last-child {
+        border-right: 2px solid #ced4da;
+    }
+
+::deep table tbody {
+    max-height: 80vh;
+}
+
+    ::deep table tbody td {
+        border-bottom: 1px solid #ced4da;
+        padding: 0.5rem;
+    }
+
+        ::deep table tbody td.wrap {
+            white-space: normal;
+        }
+
+    ::deep table tbody tr td:first-child {
+        border-left: 2px solid #ced4da;
+    }
+
+    ::deep table tbody tr td:last-child {
+        border-right: 2px solid #ced4da;
+    }
+
+        ::deep table tbody tr td:last-child:not([colspan]) {
+            width: 25%;
+        }
+
+::deep table.multiple tbody tr td.expanded:last-child {
+    border-bottom: 0;
+}
+
+::deep table.multiple thead tr th:first-child, ::deep table.multiple tbody tr td:first-child:not([colspan]),
+::deep table thead tr th:first-child.text-center, ::deep table tbody tr td:first-child.text-center {
+    width: 25%;
+}
+
+::deep table.multiple tbody tr.expandable:not(.expanded) td {
+    border-bottom: 0;
+}
+
+::deep table:not(.multiple) tbody tr:last-of-type td,
+::deep table.multiple tbody tr:nth-last-of-type(2) td:not(.expanded),
+::deep table.multiple tbody tr:last-of-type.expandable.expanded td,
+::deep table.multiple tbody tr:last-of-type:not(.expandable) td:last-child,
+::deep table.multiple tbody tr:last-of-type:not(.expandable) td:first-child {
+    border-bottom: 2px solid #ced4da;
+}
+
+    ::deep table:not(.multiple) tbody tr:last-of-type td:first-child,
+    ::deep table.multiple tbody tr:last-of-type td:first-child,
+    ::deep table.multiple tbody tr:nth-last-of-type(2) td:not(.expanded):first-child {
+        border-bottom-left-radius: .5rem;
+    }
+
+    ::deep table:not(.multiple) tbody tr:last-of-type td:last-child,
+    ::deep table.multiple tbody tr:last-of-type td:last-child,
+    ::deep table.multiple tbody tr:nth-last-of-type(2) td:not(.expanded):last-child {
+        border-bottom-right-radius: .5rem;
+    }
+
+::deep table tbody tr.action {
+    cursor: pointer;
+}
+
+/****** MEDIA QUERIES *****/
+
+/*XXL*/
+@media screen and (max-width: 2560px) {
+}
+
+/*XL*/
+@media screen and (max-width: 1440px) {
+}
+
+/*Large*/
+@media screen and (max-width: 1024px) {
+}
+
+@media screen and (min-width: 1023px) {
+    ::deep tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    ::deep table tbody td {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    ::deep .vertical-divider, ::deep .ellipses {
+        width: 4%;
+    }
+
+    ::deep table.multiple thead tr th:first-child, ::deep table.multiple tbody tr td:first-child:not([colspan]),
+    ::deep table thead tr th:first-child.text-center, ::deep table tbody tr td:first-child.text-center {
+        width: 25%;
+    }
+
+    ::deep table tbody tr td:last-child:not([colspan]) {
+        width: 25%;
+    }
+
+    ::deep .sortable i {
+        right: .5rem;
+        position: absolute;
+    }
+
+    ::deep tbody.table-height {
+        max-height: calc(85vh - 2.5rem);
+        overflow-y: auto;
+    }
+}
+
+/*Medium*/
+@media screen and (max-width: 768px) {
+    tbody.d-block {
+        display: table-row-group !important;
+    }
+}

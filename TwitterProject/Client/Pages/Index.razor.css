@@ -7,15 +7,22 @@
     font-weight: 400;
     font-size: 40px;
     line-height: 46px;
-    padding-top: 100px;
-    padding-bottom: 100px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     color: #000000;
+}
+.filter-button{
+    width: 100px;
+    height:45px;
 }
 .hashtag-card {
     background: #FFFFFF;
-    box-shadow: 0px 4px 4px azure;
+    box-shadow: 0px 4px 4px #ced4da;
     border-radius: 11px;
+    padding-right: 0px;
+    padding-left: 0px;
 }
 .hashtag-header {
-    background-color: azure;
+    background-color: #1DA1F2;
+    margin: 0px;
 }

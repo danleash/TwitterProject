@@ -3,53 +3,84 @@
 @using TwitterProject.Client.Services
 @using TwitterProject.Shared.Models
 @inject SignalRService _signalRService
+@inject TwitterLanguageService _languageService
+@inject ILogger<Index> _logger
+@inject NavigationManager _navigationManager
 
 <div class="row justify-content-center">
-    <div class="col-10">
+    <div class="col-10 my-5">
         <PageTitle>Twitter Live Stream</PageTitle>
-
-        <div class="filter-form">
-            <EditForm EditContext="EditContext" OnSubmit="OnLanguageCodeChanged">
-                <div class="row">
-                    <div class="offset-6 col-md-4 align-self-end">
-                        <InputSelect class="form-select d-flex" @bind-Value="LanguageFilter" @onchange="OnLanguageCodeChanged">
-                            <option value="">None</option>
-                            @foreach (var codestr in LanguageCodes)
-                            {
-                                <option value="@codestr">@codestr</option>
-                            }
-                        </InputSelect>
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-outline-primary col-2" type="submit">Filter</button>
-                    </div>
-                </div>
-            </EditForm>
-        </div>
-
-
-        @if (MetricModel != null && MetricModel.HashTagPairs != null)
+        @if (LanguageCodes != null)
         {
-            <div class="hashtag-card justify-content-center col-4">
-                @if (MetricModel.TweetCount != 0)
-                {
-                    <h1 class="px-2 py-2 hashtag-header">Trending Hashtags</h1>
-                    <div class="px-2 py-2">
-                        @foreach (var item in MetricModel.HashTagPairs)
-                        {
-                            <p>#@item.Key Used @item.Value times</p>
-                        }
-                    </div>
-                    <div class="px-2 py-2">
-                        Count: @MetricModel.TweetCount
-                    </div>
-                }
-                else
-                {
-                    <span>No twitter results for language: @LanguageFilter</span>
-                }
+            <EditForm EditContext="EditContext" OnSubmit="OnLanguageCodeChanged">
+                <div class="row justify-content-end filter-form">
+                    <div class="col-md-4 align-self-end">
+                        <InputSelect class="form-select" @bind-Value="LanguageFilter" @onchange="OnLanguageCodeChanged">
+                            <option value="">None</option>
+                            @foreach (var lang in LanguageCodes)
+                            {
+                            <option value="@lang">@lang</option>
+                            }
+                    </InputSelect>
+                </div>
+                <div class="col-md-1">
+                    <button class="btn btn-primary w-100" type="submit">Filter</button>
+                </div>
             </div>
+        </EditForm>
+
         }
+        <div class="row">
+            @if (MetricModel != null && MetricModel.HashTagPairs != null)
+            {
+                <div class="hashtag-card justify-content-center col-4">
+
+                    <h1 class="px-2 py-2 hashtag-header text-white">Trending Hashtags</h1>
+                    @if (MetricModel.TweetCount != 0)
+                    {
+                        <div class="px-2 py-2">
+                            @foreach (var item in MetricModel.HashTagPairs)
+                            {
+                                <p>#@item.Key Used @item.Value times</p>
+                            }
+                        </div>
+                        <div class="px-2 py-2">
+                            Count: @MetricModel.TweetCount
+                        </div>
+                    }
+                    else
+                    {
+                        <span>No twitter results for language: @LanguageFilter</span>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="spinner"></div>
+            }
+            @if (Tweets.Count > 0)
+            {
+                <div class="col-8 col-md-8">
+                    <Table Items="Tweets">
+                        <HeaderTemplate>
+                            <TableHeader DisplayText="Name" />
+                            <TableHeader DisplayText="Language Code" />
+                            <TableHeader DisplayText="Tweet" />
+                            <TableHeader DisplayText="HashTags" />
+                        </HeaderTemplate>
+                        <RowTemplate Context="context">
+                            <td>@context?.TweetHeader</td>
+                            <td>@context?.Language</td>
+                            <td>@context?.Text</td>
+                            @{
+                                var tags = context?.Entities?.Hashtags != null && context?.Entities?.Hashtags.Length > 0 ? "#" + string.Join<string>(", #", context.Entities.Hashtags.Select(x => x.Tag)) : "";
+                        }
+                        <td>@tags</td>
+                    </RowTemplate>
+                </Table>
+            </div>
+            }
+        </div>
     </div>
 </div>
 
@@ -59,16 +90,16 @@
     public string LanguageFilter = string.Empty;
     private List<TweetModel> Tweets { get; set; } = new();
     private EditContext EditContext { get; set; }
-    private List<string> LanguageCodes = new List<string> {
-            "ar","cs","da","de","el","en","es","fi","fr","he","hi","hu","id","it","ja","ko","nl","no","pl", "pt","ro","ru","sk","sv","th","tr","zh"
- };
-    protected override void OnInitialized()
+    private List<string> LanguageCodes = new();
+    protected override async Task OnInitializedAsync()
     {
-        EditContext = new EditContext(LanguageCodes);
+        EditContext = new EditContext(LanguageFilter);
         _signalRService.TweetMetricReceived += OnMetricsReceived;
         _signalRService.TweetReceived += OnTweetReceived;
         _signalRService.StartSignalRStream();
+        await base.OnInitializedAsync();
     }
+
     private async void OnMetricsReceived(TweetMetricStreamModel model)
     {
         MetricModel = model;
@@ -76,15 +107,30 @@
     }
     private async void OnTweetReceived(TweetModel model)
     {
-        Tweets.Add(model);
+        //If the code of new tweet isnt in the language filter add it
+        if (!LanguageCodes.Contains(model.Language) && !string.IsNullOrWhiteSpace(model.Language)) LanguageCodes.Add(model.Language);
+        //If no filter exists add the tweet.
+        if (string.IsNullOrWhiteSpace(LanguageFilter)) Tweets.Add(model);
+        //Filter exists we must make sure to only add tweets with the filter. This allows the channel to catch up with the filter.
+        else if (!string.IsNullOrWhiteSpace(LanguageFilter) && model.Language == LanguageFilter)
+        {
+            Tweets.Add(model);
+        }
         await InvokeAsync(StateHasChanged);
     }
+
     private async void OnLanguageCodeChanged()
     {
-        Tweets.Clear();
-        MetricModel = new();
-        await InvokeAsync(StateHasChanged);
-        _signalRService.SetLanguageFilter(LanguageFilter);
-        await InvokeAsync(StateHasChanged);
+        try
+        {
+            _signalRService.SetLanguageFilter(LanguageFilter);
+            Tweets.Clear();
+            MetricModel = new();
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Failed to set language filter on stream.");
+        }
     }
 }
