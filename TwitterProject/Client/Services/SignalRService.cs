@@ -53,6 +53,7 @@ namespace TwitterProject.Client.Services
             if(IsConnected) _logger.LogInformation("Signal R Hub connected.");
 
         }
+        //Takes the filter langauge code and sets the language on the server for filtering the incoming stream
         public async void SetLanguageFilter(string languageCode)
         {
             _logger.LogInformation($"Setting language filter to {languageCode}.");
