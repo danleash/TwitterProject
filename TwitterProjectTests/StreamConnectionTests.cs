@@ -1,17 +1,9 @@
-using Microsoft.AspNet.SignalR.Hubs;
-using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Threading;
 using TwitterProject.Server.Services;
 using TwitterProject.Shared.Models;
 
@@ -20,12 +12,10 @@ namespace TwitterProjectTests
     [TestClass]
     public class StreamConnectionTests
     {
-        private string _accessToken { get; set; }
         private int TweetCount { get; set; }
         private TweetModel TweetModel { get; set; }
         Mock<TweetStorageService> _tweetStorageService = new Mock<TweetStorageService>();
         private TwitterStreamResponse TwitterStreamResponse { get; set; }
-        private Stream TwitterStreamResult { get; set; }
         public StreamConnectionTests()
         {
             TwitterStreamResponse = new TwitterStreamResponse()

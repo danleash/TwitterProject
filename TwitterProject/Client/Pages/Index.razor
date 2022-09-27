@@ -7,9 +7,11 @@
 @inject ILogger<Index> _logger
 @inject NavigationManager _navigationManager
 
-<div class="row justify-content-center">
+<div class="row justify-content-center viewheight-Table">
     <div class="col-10 my-5">
         <PageTitle>Twitter Live Stream</PageTitle>
+        <h1>Live Twitter Stream</h1>
+        <h3>Coding assessment utilizing SignalR to stream metrics from the Twitter Api</h3>
         @if (LanguageCodes != null)
         {
             <EditForm EditContext="EditContext" OnSubmit="OnLanguageCodeChanged">
@@ -33,7 +35,7 @@
         <div class="row">
             @if (MetricModel != null && MetricModel.HashTagPairs != null)
             {
-                <div class="hashtag-card justify-content-center col-4">
+                <div class="hashtag-card justify-content-center col-4 viewheight">
 
                     <h1 class="px-2 py-2 hashtag-header text-white">Trending Hashtags</h1>
                     @if (MetricModel.TweetCount != 0)
@@ -61,7 +63,7 @@
             @if (Tweets.Count > 0)
             {
                 <div class="col-8 col-md-8">
-                    <Table Items="Tweets">
+                    <Table Items="Tweets" TableBodyClasses="@TableClasses">
                         <HeaderTemplate>
                             <TableHeader DisplayText="Name" />
                             <TableHeader DisplayText="Language Code" />
@@ -85,6 +87,7 @@
 </div>
 
 @code {
+    private string TableClasses = "h-75";
     private int TweetCount { get; set; }
     private TweetMetricStreamModel MetricModel { get; set; } = new();
     public string LanguageFilter = string.Empty;
@@ -94,6 +97,7 @@
     protected override async Task OnInitializedAsync()
     {
         EditContext = new EditContext(LanguageFilter);
+        //Bind to signalr message receival
         _signalRService.TweetMetricReceived += OnMetricsReceived;
         _signalRService.TweetReceived += OnTweetReceived;
         _signalRService.StartSignalRStream();

@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using TwitterProject.Shared.Models;
-using Microsoft.AspNetCore.ResponseCompression;
 namespace TwitterProject.Server.Services
 {
     public class SignalRStreamService : Hub
     {
-        private string Filter { get; set; }
         private readonly TweetStorageService _storageService;
         private readonly ILogger<SignalRStreamService> _logger;
         public SignalRStreamService(TweetStorageService storageService, ILoggerFactory loggerFactory)

@@ -1,6 +1,11 @@
 ﻿body {
 }
-
+.viewheight {
+    max-height: 50vh;
+}
+.viewheight-Table {
+    max-height: 70vh;
+}
 .filter-form {
     font-family: 'Judson';
     font-style: normal;
